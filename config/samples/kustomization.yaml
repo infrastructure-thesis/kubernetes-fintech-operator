@@ -1,0 +1,6 @@
+## Append samples of your project ##
+resources:
+- fintech_v1alpha1_settlementworker.yaml
+- fintech_v1alpha1_tradingbot.yaml
+- fintech_v1alpha1_reconciliationjob.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples

@@ -1,0 +1,9 @@
+apiVersion: fintech.fintech.io/v1alpha1
+kind: TradingBot
+metadata:
+  labels:
+    app.kubernetes.io/name: fintech-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: tradingbot-sample
+spec:
+  # TODO(user): Add fields here
