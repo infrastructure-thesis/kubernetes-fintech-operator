@@ -1,96 +1,124 @@
-/*
-Copyright 2026.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+// +kubebuilder:validation:Enum=high;medium;low
+type SchedulingPriority string
 
-// SettlementWorkerSpec defines the desired state of SettlementWorker
+const (
+	PriorityHigh   SchedulingPriority = "high"
+	PriorityMedium SchedulingPriority = "medium"
+	PriorityLow    SchedulingPriority = "low"
+)
+
+// PnlMonitoringConfig defines P&L monitoring behavior for auto-rollback.
+type PnlMonitoringConfig struct {
+	// Enabled enables P&L anomaly detection.
+	// +kubebuilder:default=false
+	Enabled bool `json:"enabled,omitempty"`
+
+	// CheckInterval is how often to check P&L (seconds).
+	// +kubebuilder:default=60
+	CheckInterval int32 `json:"checkInterval,omitempty"`
+
+	// RollbackThreshold is the loss threshold (e.g., "$100000") that triggers rollback.
+	// +kubebuilder:validation:Pattern=`^\$\d+$`
+	RollbackThreshold string `json:"rollbackThreshold,omitempty"`
+
+	// MetricsEndpoint is the Prometheus endpoint for P&L metrics.
+	MetricsEndpoint string `json:"metricsEndpoint,omitempty"`
+}
+
+// SettlementWorkerSpec defines the desired state of SettlementWorker.
 type SettlementWorkerSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-	// The following markers will use OpenAPI v3 schema to validate the value
-	// More info: https://book.kubebuilder.io/reference/markers/crd-validation.html
+	// Replicas is the number of settlement worker pods.
+	// +kubebuilder:default=1
+	Replicas *int32 `json:"replicas,omitempty"`
 
-	// foo is an example field of SettlementWorker. Edit settlementworker_types.go to remove/update
-	// +optional
-	Foo *string `json:"foo,omitempty"`
+	// SchedulingPriority defines the QoS priority for scheduling.
+	// +kubebuilder:default=medium
+	SchedulingPriority SchedulingPriority `json:"schedulingPriority,omitempty"`
+
+	// SettlementType describes the workload (e.g., "daily-reconciliation").
+	// +kubebuilder:validation:MinLength=1
+	SettlementType string `json:"settlementType,omitempty"`
+
+	// MaxInFlightTransactions prevents accepting new transactions above this limit.
+	// +kubebuilder:default=10000
+	MaxInFlightTransactions int64 `json:"maxInFlightTransactions,omitempty"`
+
+	// GracefulShutdownTimeout is the time (seconds) to wait for transaction drain.
+	// +kubebuilder:default=30
+	GracefulShutdownTimeout int32 `json:"gracefulShutdownTimeout,omitempty"`
+
+	// ComplianceLabels enforces required tags (e.g., pci, fca).
+	// +kubebuilder:validation:Optional
+	ComplianceLabels map[string]string `json:"complianceLabels,omitempty"`
+
+	// PnlMonitoring enables auto-rollback based on financial metrics.
+	// +kubebuilder:validation:Optional
+	PnlMonitoring *PnlMonitoringConfig `json:"pnlMonitoring,omitempty"`
+
+	// Template is the pod template for the underlying Deployment.
+	// +kubebuilder:validation:Required
+	Template corev1.PodTemplateSpec `json:"template"`
 }
 
 // SettlementWorkerStatus defines the observed state of SettlementWorker.
 type SettlementWorkerStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Phase indicates the overall state: Pending, Running, Failed, etc.
+	Phase string `json:"phase,omitempty"`
 
-	// For Kubernetes API conventions, see:
-	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
+	// Replicas is the current number of replicas.
+	Replicas int32 `json:"replicas,omitempty"`
 
-	// conditions represent the current state of the SettlementWorker resource.
-	// Each condition has a unique type and reflects the status of a specific aspect of the resource.
-	//
-	// Standard condition types include:
-	// - "Available": the resource is fully functional
-	// - "Progressing": the resource is being created or updated
-	// - "Degraded": the resource failed to reach or maintain its desired state
-	//
-	// The status of each condition is one of True, False, or Unknown.
-	// +listType=map
-	// +listMapKey=type
-	// +optional
+	// ReadyReplicas is the number of ready replicas.
+	ReadyReplicas int32 `json:"readyReplicas,omitempty"`
+
+	// Conditions represent the latest available observations.
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
+
+	// LastRollbackReason explains why an auto-rollback was triggered.
+	LastRollbackReason string `json:"lastRollbackReason,omitempty"`
+
+	// LastRollbackTime is the timestamp of the last auto-rollback.
+	LastRollbackTime *metav1.Time `json:"lastRollbackTime,omitempty"`
+
+	// ProcessedTransactions is the total count of transactions processed.
+	ProcessedTransactions int64 `json:"processedTransactions,omitempty"`
+
+	// ObservedGeneration helps detect spec drift.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Replicas",type=integer,JSONPath=`.status.replicas`
+// +kubebuilder:printcolumn:name="Ready",type=integer,JSONPath=`.status.readyReplicas`
+// +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 
-// SettlementWorker is the Schema for the settlementworkers API
+// SettlementWorker is the Schema for the settlementworkers API.
 type SettlementWorker struct {
-	metav1.TypeMeta `json:",inline"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// metadata is a standard object metadata
-	// +optional
-	metav1.ObjectMeta `json:"metadata,omitzero"`
-
-	// spec defines the desired state of SettlementWorker
-	// +required
-	Spec SettlementWorkerSpec `json:"spec"`
-
-	// status defines the observed state of SettlementWorker
-	// +optional
-	Status SettlementWorkerStatus `json:"status,omitzero"`
+	Spec   SettlementWorkerSpec   `json:"spec,omitempty"`
+	Status SettlementWorkerStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// SettlementWorkerList contains a list of SettlementWorker
+// SettlementWorkerList contains a list of SettlementWorker.
 type SettlementWorkerList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitzero"`
+	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []SettlementWorker `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(func(s *runtime.Scheme) error {
-		s.AddKnownTypes(SchemeGroupVersion, &SettlementWorker{}, &SettlementWorkerList{})
-		return nil
-	})
+	SchemeBuilder.Register(&SettlementWorker{}, &SettlementWorkerList{})
 }

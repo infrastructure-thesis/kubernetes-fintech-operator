@@ -1,7 +1,27 @@
-bin/
-*.o
-*.a
+# Binaries
+/bin/
+*.exe
+*.exe~
+*.dll
 *.so
-.DS_Store
-.env
-bin/controller-gen
+*.dylib
+
+# Test binary
+*.test
+
+# Output of go coverage tool
+*.out
+coverage.html
+
+# Dependency directories
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Kubernetes generated files
+config/crd/bases/*.yaml
+config/rbac/*.yaml

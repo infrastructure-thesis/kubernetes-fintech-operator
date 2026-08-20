@@ -61,6 +61,7 @@ type ReconciliationJobStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // ReconciliationJob is the Schema for the reconciliationjobs API
 type ReconciliationJob struct {
