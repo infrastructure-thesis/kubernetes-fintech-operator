@@ -1,0 +1,9 @@
+apiVersion: fintech.fintech.io/v1alpha1
+kind: SettlementWorker
+metadata:
+  labels:
+    app.kubernetes.io/name: fintech-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: settlementworker-sample
+spec:
+  # TODO(user): Add fields here

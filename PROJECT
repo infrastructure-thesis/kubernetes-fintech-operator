@@ -8,4 +8,32 @@ layout:
 - go.kubebuilder.io/v4
 projectName: fintech-operator
 repo: github.com/infrastructure-thesis/kubernetes-fintech-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: fintech.io
+  group: fintech
+  kind: SettlementWorker
+  path: github.com/infrastructure-thesis/kubernetes-fintech-operator/api/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: fintech.io
+  group: fintech
+  kind: TradingBot
+  path: github.com/infrastructure-thesis/kubernetes-fintech-operator/api/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: fintech.io
+  group: fintech
+  kind: ReconciliationJob
+  path: github.com/infrastructure-thesis/kubernetes-fintech-operator/api/v1alpha1
+  version: v1alpha1
 version: "3"
