@@ -61,7 +61,7 @@ func (r *SettlementWorkerReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	}
 
 	// Handle deletion with finalizer
-	if sw.ObjectMeta.DeletionTimestamp != nil {
+	if sw.DeletionTimestamp != nil {
 		if controllerutil.ContainsFinalizer(sw, settlementWorkerFinalizerName) {
 			// Cleanup logic here
 			controllerutil.RemoveFinalizer(sw, settlementWorkerFinalizerName)
