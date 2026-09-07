@@ -5,6 +5,18 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - fintech.fintech.io
   resources:
   - reconciliationjobs
@@ -32,6 +44,32 @@ rules:
   - reconciliationjobs/status
   - settlementworkers/status
   - tradingbots/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - fintech.io
+  resources:
+  - settlementworkers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - fintech.io
+  resources:
+  - settlementworkers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - fintech.io
+  resources:
+  - settlementworkers/status
   verbs:
   - get
   - patch
