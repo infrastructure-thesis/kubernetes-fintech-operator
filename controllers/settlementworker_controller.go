@@ -47,6 +47,8 @@ type SettlementWorkerReconciler struct {
 // +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile implements the reconciliation loop
+// +kubebuilder:rbac:groups=fintech.io,resources=settlementworkers,verbs=get;list;watch;create;update;patch;delete
+// nolint:dupl
 func (r *SettlementWorkerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
 
@@ -102,7 +104,7 @@ func (r *SettlementWorkerReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	}
 
 	// Update status
-	sw.Status.Phase = "Running"
+	sw.Status.Phase = phaseRunning
 	sw.Status.Replicas = *deployment.Spec.Replicas
 	sw.Status.ReadyReplicas = deployment.Status.ReadyReplicas
 	sw.Status.ObservedGeneration = sw.Generation
@@ -122,8 +124,8 @@ func (r *SettlementWorkerReconciler) constructDeployment(sw *fintechv1alpha1.Set
 	}
 
 	labels := map[string]string{
-		"app":      "settlement-worker",
-		"instance": sw.Name,
+		"labelApp":      "settlement-worker",
+		"labelInstance": sw.Name,
 	}
 
 	return &appsv1.Deployment{

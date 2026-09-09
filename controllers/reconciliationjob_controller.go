@@ -46,6 +46,8 @@ type ReconciliationJobReconciler struct {
 // +kubebuilder:rbac:groups=fintech.io,resources=reconciliationjobs/finalizers,verbs=update
 // +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 
+// +kubebuilder:rbac:groups=fintech.io,resources=reconciliationjobs,verbs=get;list;watch;create;update;patch;delete
+// nolint:dupl
 func (r *ReconciliationJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
 
@@ -80,7 +82,7 @@ func (r *ReconciliationJobReconciler) Reconcile(ctx context.Context, req ctrl.Re
 
 	err := r.Get(ctx, deploymentName, deployment)
 	if err != nil && apierrors.IsNotFound(err) {
-		deployment = r.constructReconciliationJobDeployment(rj)
+		deployment = r.constructDeployment(rj)
 		if err := controllerutil.SetControllerReference(rj, deployment, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -94,7 +96,7 @@ func (r *ReconciliationJobReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		return ctrl.Result{}, err
 	}
 
-	rj.Status.Phase = "Running"
+	rj.Status.Phase = phaseRunning
 	rj.Status.Replicas = *deployment.Spec.Replicas
 	rj.Status.ReadyReplicas = deployment.Status.ReadyReplicas
 	rj.Status.ObservedGeneration = rj.Generation
@@ -107,15 +109,15 @@ func (r *ReconciliationJobReconciler) Reconcile(ctx context.Context, req ctrl.Re
 	return ctrl.Result{}, nil
 }
 
-func (r *ReconciliationJobReconciler) constructReconciliationJobDeployment(rj *fintechv1alpha1.ReconciliationJob) *appsv1.Deployment {
+func (r *ReconciliationJobReconciler) constructDeployment(rj *fintechv1alpha1.ReconciliationJob) *appsv1.Deployment {
 	replicas := int32(1)
 	if rj.Spec.Replicas != nil {
 		replicas = *rj.Spec.Replicas
 	}
 
 	labels := map[string]string{
-		"app":      "reconciliation-job",
-		"instance": rj.Name,
+		labelApp:      "reconciliation-job",
+		labelInstance: rj.Name,
 	}
 
 	return &appsv1.Deployment{

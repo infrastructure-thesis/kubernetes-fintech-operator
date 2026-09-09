@@ -47,6 +47,8 @@ type TradingBotReconciler struct {
 // +kubebuilder:rbac:groups=fintech.io,resources=tradingbots/finalizers,verbs=update
 // +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 
+// +kubebuilder:rbac:groups=fintech.io,resources=tradingbots,verbs=get;list;watch;create;update;patch;delete
+// nolint:dupl
 func (r *TradingBotReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
 
@@ -95,7 +97,7 @@ func (r *TradingBotReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 
-	tb.Status.Phase = "Running"
+	tb.Status.Phase = phaseRunning
 	tb.Status.Replicas = *deployment.Spec.Replicas
 	tb.Status.ReadyReplicas = deployment.Status.ReadyReplicas
 	tb.Status.ObservedGeneration = tb.Generation
@@ -115,8 +117,8 @@ func (r *TradingBotReconciler) constructTradingBotDeployment(tb *fintechv1alpha1
 	}
 
 	labels := map[string]string{
-		"app":      "trading-bot",
-		"instance": tb.Name,
+		labelApp:      "trading-bot",
+		labelInstance: tb.Name,
 	}
 
 	return &appsv1.Deployment{
