@@ -30,6 +30,10 @@ spec:
       - name: manager
         image: example.com/fintech-operator:v1.0.0
         imagePullPolicy: IfNotPresent
+        args:
+        - --leader-elect
+        command:
+        - /manager
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
