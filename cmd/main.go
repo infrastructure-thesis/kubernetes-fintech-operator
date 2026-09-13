@@ -36,7 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	fintechv1alpha1 "github.com/infrastructure-thesis/kubernetes-fintech-operator/api/v1alpha1"
-	"github.com/infrastructure-thesis/kubernetes-fintech-operator/internal/controller"
+	controllers "github.com/infrastructure-thesis/kubernetes-fintech-operator/controllers"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -178,21 +178,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := (&controller.SettlementWorkerReconciler{
+	if err := (&controllers.SettlementWorkerReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "Failed to create controller", "controller", "settlementworker")
 		os.Exit(1)
 	}
-	if err := (&controller.TradingBotReconciler{
+	if err := (&controllers.TradingBotReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "Failed to create controller", "controller", "tradingbot")
 		os.Exit(1)
 	}
-	if err := (&controller.ReconciliationJobReconciler{
+	if err := (&controllers.ReconciliationJobReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
@@ -213,6 +213,13 @@ func main() {
 	setupLog.Info("Starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "Failed to run manager")
+		os.Exit(1)
+	}
+	if err = (&controllers.SettlementWorkerReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "SettlementWorker")
 		os.Exit(1)
 	}
 }

@@ -1,9 +1,9 @@
-apiVersion: fintech.fintech.io/v1alpha1
+apiVersion: fintech.io/v1alpha1
 kind: ReconciliationJob
 metadata:
-  labels:
-    app.kubernetes.io/name: fintech-operator
-    app.kubernetes.io/managed-by: kustomize
   name: reconciliationjob-sample
 spec:
-  # TODO(user): Add fields here
+  replicas: 5
+  image: example.com/reconciliation-job:v1.0
+  batchSize: 100000
+  checkpointInterval: 50000
