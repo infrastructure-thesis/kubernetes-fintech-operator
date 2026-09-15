@@ -28,7 +28,7 @@ spec:
       serviceAccountName: fintech-operator-controller-manager
       containers:
       - name: manager
-        image: example.com/fintech-operator:v1.0.0
+        image: example.com/fintech-operator:v0.0.1
         imagePullPolicy: IfNotPresent
         args:
         - --leader-elect
