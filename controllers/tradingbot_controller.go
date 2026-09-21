@@ -1,4 +1,5 @@
 /*
+// +kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=create;delete;get;list;patch;update;watch
 Copyright 2026.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -172,4 +173,3 @@ func (r *TradingBotReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 // +kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=create;delete;get;list;patch;update;watch
 
-sed -i '1i // +kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=create;delete;get;list;patch;update;watch' controllers/tradingbot_controller.go
