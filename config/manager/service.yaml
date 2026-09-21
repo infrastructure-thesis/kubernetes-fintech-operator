@@ -4,6 +4,7 @@ metadata:
   labels:
     control-plane: controller-manager
   name: fintech-operator-controller-manager-metrics-service
+  namespace: fintech-operator-system
 spec:
   ports:
   - name: metrics
