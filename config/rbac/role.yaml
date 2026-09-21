@@ -1,52 +1,9 @@
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: manager-role
 rules:
-- apiGroups:
-  - fintech.io
-  resources:
-  - settlementworkers
-  - tradingbots
-  - reconciliationjobs
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - fintech.io
-  resources:
-  - settlementworkers/finalizers
-  - tradingbots/finalizers
-  - reconciliationjobs/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - fintech.io
-  resources:
-  - settlementworkers/status
-  - tradingbots/status
-  - reconciliationjobs/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - coordination.k8s.io
-  resources:
-  - leases
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
 - apiGroups:
   - apps
   resources:
@@ -60,9 +17,37 @@ rules:
   - update
   - watch
 - apiGroups:
-  - ""
+  - fintech.fintech.io
+  - fintech.io
   resources:
-  - events
+  - reconciliationjobs
+  - settlementworkers
+  - tradingbots
   verbs:
   - create
+  - delete
+  - get
+  - list
   - patch
+  - update
+  - watch
+- apiGroups:
+  - fintech.fintech.io
+  - fintech.io
+  resources:
+  - reconciliationjobs/finalizers
+  - settlementworkers/finalizers
+  - tradingbots/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - fintech.fintech.io
+  - fintech.io
+  resources:
+  - reconciliationjobs/status
+  - settlementworkers/status
+  - tradingbots/status
+  verbs:
+  - get
+  - patch
+  - update
