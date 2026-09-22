@@ -1,9 +1,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: metrics-reader
+  name: fintech-operator-metrics-reader
 rules:
-- nonResourceURLs:
-  - "/metrics"
+- apiGroups:
+  - metrics.k8s.io
+  resources:
+  - pods
+  - nodes
   verbs:
   - get
+  - list
