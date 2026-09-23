@@ -27,7 +27,7 @@ spec:
         imagePullPolicy: IfNotPresent
         args:
         - --leader-elect
-        - --metrics-bind-address=:8443
+        - --metrics-bind-address=:8080
         command:
         - /manager
         securityContext:
