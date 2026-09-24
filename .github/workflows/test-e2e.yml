@@ -33,6 +33,9 @@ jobs:
         run: kind version
 
       - name: Running Test e2e
+        env:
+          IMG: fintech-operator:e2e
+          KIND_CLUSTER: fintech-operator-test-e2e
         run: |
           go mod tidy
-          make test-e2e
+          make test-e2e IMG="${IMG}"

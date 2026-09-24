@@ -31,12 +31,14 @@ import (
 	"github.com/infrastructure-thesis/kubernetes-fintech-operator/test/utils"
 )
 
-var (
-	// managerImage is the manager image to be built and loaded for testing.
-	managerImage = "example.com/fintech-operator:v0.0.1"
-	// shouldCleanupCertManager tracks whether CertManager was installed by this suite.
-	shouldCleanupCertManager = false
-)
+var managerImage = func() string {
+	if image := os.Getenv("IMG"); image != "" {
+		return image
+	}
+	return "fintech-operator:e2e"
+}()
+
+var shouldCleanupCertManager = false
 
 // TestE2E runs the e2e test suite to validate the solution in an isolated environment.
 // The default setup requires Kind and CertManager.
