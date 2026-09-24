@@ -8,46 +8,25 @@ rules:
   resources:
   - deployments
   verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
-- apiGroups:
-  - fintech.io
-  resources:
-  - settlementworkers
-  - tradingbots
-  - reconciliationjobs
-  verbs:
   - create
   - delete
-  - deletecollection
   - get
   - list
   - patch
   - update
   - watch
 - apiGroups:
-  - fintech.io
+  - coordination.k8s.io
   resources:
-  - settlementworkers/finalizers
-  - tradingbots/finalizers
-  - reconciliationjobs/finalizers
+  - leases
   verbs:
-  - update
-- apiGroups:
-  - fintech.io
-  resources:
-  - settlementworkers/status
-  - tradingbots/status
-  - reconciliationjobs/status
-  verbs:
+  - create
+  - delete
   - get
+  - list
   - patch
   - update
+  - watch
 - apiGroups:
   - ""
   resources:
@@ -56,14 +35,34 @@ rules:
   - create
   - patch
 - apiGroups:
-  - coordination.k8s.io
+  - fintech.io
   resources:
-  - leases
+  - reconciliationjobs
+  - settlementworkers
+  - tradingbots
   verbs:
+  - create
+  - delete
   - get
   - list
-  - watch
-  - create
-  - update
   - patch
-  - delete
+  - update
+  - watch
+- apiGroups:
+  - fintech.io
+  resources:
+  - reconciliationjobs/finalizers
+  - settlementworkers/finalizers
+  - tradingbots/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - fintech.io
+  resources:
+  - reconciliationjobs/status
+  - settlementworkers/status
+  - tradingbots/status
+  verbs:
+  - get
+  - patch
+  - update

@@ -32,3 +32,4 @@ resources:
 - settlementworker_editor_role.yaml
 - settlementworker_viewer_role.yaml
 
+- metrics_reader_role.yaml
