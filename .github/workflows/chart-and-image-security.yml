@@ -1,0 +1,40 @@
+name: chart-and-image-security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  helm-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.16.2
+      - run: helm lint charts/fintech-operator
+      - run: helm template fintech-operator charts/fintech-operator > /dev/null
+
+  image-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t fintech-operator:scan .
+      - name: Trivy vulnearbility scan
+        uses: aquasecurity/trivy-action@0.28.0  # verify latest tag; pin to commit SHA before relying on it
+        with:
+          image-ref: fintech-operator:scan
+          severity: CRITICAL,HIGH
+          exit-code: "1"
+          ignore-unfixed: true
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0            # verify version; pin to commit SHA
+        with:
+          image: fintech-operator:scan
+          format: spdx-json
+          artifact-name: sbom.spdx.json

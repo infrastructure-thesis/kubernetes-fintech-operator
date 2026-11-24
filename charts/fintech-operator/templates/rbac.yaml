@@ -1,0 +1,70 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "fintech-operator.fullname" . }}-manager-role
+  labels:
+    {{- include "fintech-operator.labels" . | nindent 4 }}
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create", "patch"]
+- apiGroups: ["fintech.io"]
+  resources: ["reconciliationjobs", "settlementworkers", "tradingbots"]
+  verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+- apiGroups: ["fintech.io"]
+  resources: ["reconciliationjobs/finalizers", "settlementworkers/finalizers", "tradingbots/finalizers"]
+  verbs: ["update"]
+- apiGroups: ["fintech.io"]
+  resources: ["reconciliationjobs/status", "settlementworkers/status", "tradingbots/status"]
+  verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "fintech-operator.fullname" . }}-manager-rolebinding
+  labels:
+    {{- include "fintech-operator.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "fintech-operator.fullname" . }}-manager-role
+subjects:
+- kind: ServiceAccount 
+  name: {{ include "fintech-operator.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+---
+# Delegated authn/authz for the secured metrics endpoint (:8080 uses the auth filter).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "fintech-operator.fullname" . }}-metrics-auth-role
+  labels:
+    {{- include "fintech-operator.labels" . | nindent 4 }}
+rules:
+- apiGroups: ["authentication.k8s.io"]
+  resources: ["tokenreviews"]
+  verbs: ["create"]
+- apiGroups: ["authorization.k8s.io"]
+  resources: ["subjectaccessreviews"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "fintech-operator.fullname" . }}-metrics-auth-rolebinding
+  labels:
+    {{- include "fintech-operator.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "fintech-operator.fullname" . }}-metrics-auth-role
+subjects:
+- kind: ServiceAccount 
+  name: {{ include "fintech-operator.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}

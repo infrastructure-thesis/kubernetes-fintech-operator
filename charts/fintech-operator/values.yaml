@@ -1,0 +1,24 @@
+replicaCount: 1
+
+image:
+  repository: fintech-operator   # set to your registry path once images are pushed
+  tag: ""                        # defaults to Chart.AppVersion
+  pullPolicy: IfNotPresent
+
+leaderElect: true
+
+metrics:
+  bindAddress: ":8080"           # keep in sync with metrics.port
+  port: 8080
+
+serviceAccount:
+  create: true
+  name: ""
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
