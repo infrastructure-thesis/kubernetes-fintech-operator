@@ -26,7 +26,7 @@ jobs:
       - name: Build image
         run: docker build -t fintech-operator:scan .
       - name: Trivy vulnearbility scan
-        uses: aquasecurity/trivy-action@0.36.0  # verify latest tag; pin to commit SHA before relying on it
+        uses: aquasecurity/trivy-action@v0.36.0  # verify latest tag; pin to commit SHA before relying on it
         with:
           image-ref: fintech-operator:scan
           severity: CRITICAL,HIGH
