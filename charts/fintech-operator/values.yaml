@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  repository: fintech-operator   # set to your registry path once images are pushed
-  tag: ""                        # defaults to Chart.AppVersion
+  repository: ghcr.io/infrastructure-thesis/kubernetes-fintech-operator
+  tag: ""                        # set per release, e.g --set image.tag=sha-<short-sha>
   pullPolicy: IfNotPresent
 
 leaderElect: true

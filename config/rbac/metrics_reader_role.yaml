@@ -3,11 +3,7 @@ kind: ClusterRole
 metadata:
   name: fintech-operator-metrics-reader
 rules:
-- apiGroups:
-  - metrics.k8s.io
-  resources:
-  - pods
-  - nodes
+- nonResourceURLs:
+  - /metrics
   verbs:
   - get
-  - list
