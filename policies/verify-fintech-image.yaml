@@ -1,0 +1,36 @@
+apiVersion: policies.kyverno.io/v1
+kind: ImageValidatingPolicy
+metadata:
+  name: verify-fintech-operator-image
+spec:
+  validationActions: [Deny]
+  failurePolicy: Fail
+  webhookConfiguration:
+    timeoutSeconds: 30
+  validationConfigurations:
+    mutateDigest: false
+    verifyDigest: false
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ['']
+        apiVersions: ['v1']
+        operations: ['CREATE', 'UPDATE']
+        resources: ['pods']
+  matchImageReferences:
+    - glob: "ghcr.io/infrastructure-thesis/kubernetes-fintech-operator*"
+  attestors:
+    - name: cosign
+      cosign:
+        keyless:
+          identities:
+            - subject: 'https://github.com/infrastructure-thesis/kubernetes-fintech-operator/.github/workflows/release-image.yml@refs/heads/main'
+              issuer: 'https://token.actions.githubusercontent.com'
+        ctlog:
+          url: 'https://rekor.sigstore.dev'
+  validations:
+    - expression: >-
+        images.containers.map(image, verifyImageSignatures(image, [attestors.cosign])).all(e, e > 0)
+      message: 'Image must be signed by the release-image workflow on main'
