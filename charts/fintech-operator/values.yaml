@@ -2,7 +2,8 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/infrastructure-thesis/kubernetes-fintech-operator
-  tag: ""                        # set per release, e.g --set image.tag=sha-<short-sha>
+  tag: ""
+  digest: ""                     # set to sha256:... to pin the deployed image
   pullPolicy: IfNotPresent
 
 leaderElect: true

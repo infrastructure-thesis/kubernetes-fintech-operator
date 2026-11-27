@@ -9,7 +9,7 @@ spec:
     timeoutSeconds: 30
   validationConfigurations:
     mutateDigest: false
-    verifyDigest: false
+    verifyDigest: true
   evaluation:
     background:
       enabled: false
