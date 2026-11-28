@@ -62,6 +62,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           provenance: true
           sbom: true
+      - name: Record digest for chart update
+        run: echo "image digest: ${{ steps.push.outputs.digest }}" >> "$GITHUB_STEP_SUMMARY"
       - uses: sigstore/cosign-installer@v3
       - name: Sign image (keyless, via GitHub OIDC)
         env:

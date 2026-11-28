@@ -18,6 +18,11 @@ jobs:
           version: v3.16.2
       - run: helm lint charts/fintech-operator
       - run: helm template fintech-operator charts/fintech-operator > /dev/null
+      - name: Require pinned image digest
+        run: |
+          digest=$(grep -E '^  digest:' charts/fintech-operator/values.yaml | awk '{print $2}' | tr -d '"')
+          echo "$digest" | grep -Eq '^sha256:[0-9a-f]{64}$' \
+            || { echo "values.yaml image.digest must be a sha256 digest"; exit 1; }
 
   image-scan:
     runs-on: ubuntu-latest
